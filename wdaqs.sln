@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs", "wdaqs\wdaqs.csproj", "{601A08A3-79D0-41B3-A076-39BC18746240}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.shared", "wdaqs.shared\wdaqs.shared.csproj", "{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.tests", "wdaqs.tests\wdaqs.tests.csproj", "{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{601A08A3-79D0-41B3-A076-39BC18746240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{601A08A3-79D0-41B3-A076-39BC18746240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{601A08A3-79D0-41B3-A076-39BC18746240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{601A08A3-79D0-41B3-A076-39BC18746240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1EA9820C-6F69-459A-8E8E-65442BA0BB73}
+	EndGlobalSection
+EndGlobal
