@@ -3,13 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs", "wdaqs\wdaqs.csproj", "{601A08A3-79D0-41B3-A076-39BC18746240}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.shared", "wdaqs.shared\wdaqs.shared.csproj", "{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.tests", "wdaqs.tests\wdaqs.tests.csproj", "{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.core", "wdaqs.core\wdaqs.core.csproj", "{347AF4B8-22CF-4AC5-877C-278F6400CD34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{575FF703-0D76-4A30-BE3B-DB97C48F54F9}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pipeline.yml = .github\workflows\pipeline.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +20,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{601A08A3-79D0-41B3-A076-39BC18746240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{601A08A3-79D0-41B3-A076-39BC18746240}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{601A08A3-79D0-41B3-A076-39BC18746240}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{601A08A3-79D0-41B3-A076-39BC18746240}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1DD2C76-B7DA-4069-B061-66DB22B98C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
