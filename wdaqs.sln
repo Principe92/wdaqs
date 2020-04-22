@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.shared", "wdaqs.share
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.tests", "wdaqs.tests\wdaqs.tests.csproj", "{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wdaqs.core", "wdaqs.core\wdaqs.core.csproj", "{347AF4B8-22CF-4AC5-877C-278F6400CD34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EC37E3D-F9F3-4C1B-BCE2-5DD5E6E6B487}.Release|Any CPU.Build.0 = Release|Any CPU
+		{347AF4B8-22CF-4AC5-877C-278F6400CD34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{347AF4B8-22CF-4AC5-877C-278F6400CD34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{347AF4B8-22CF-4AC5-877C-278F6400CD34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{347AF4B8-22CF-4AC5-877C-278F6400CD34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
