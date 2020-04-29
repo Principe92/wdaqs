@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: SetUp NuGet
-    - uses: warrenbuckley/Setup-NuGet@v1
+      uses: warrenbuckley/Setup-NuGet@v1
     - name: Restore Packages
       run: nuget restore wdaqs.sln
     - name: SetUp MSBuild.exe
