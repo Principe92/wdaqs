@@ -24,7 +24,11 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: actions/checkout@master
-    - uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.100' # SDK Version to use.
-    - run: dotnet build wdaqs
+    - name: SetUp NuGet
+      uses: warrenbuckley/Setup-NuGet@v1
+    - name: Restore Packages
+      run: nuget restore wdaqs.sln
+    - name: SetUp MSBuild.exe
+      uses: warrenbuckley/SetUp-MSBuild@v1
+    - name: Build with MSBuild
+      run: msbuild wdaqs.sln -p:Configuration=Release
