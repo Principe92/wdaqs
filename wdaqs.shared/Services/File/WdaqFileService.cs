@@ -41,9 +41,20 @@ namespace wdaqs.shared.Services.File
 
                 System.IO.File.WriteAllText(path, string.Empty);
 
-                log.Information("started a new run file: {file}", fileName);
+                log.Information("started a new run file: {file}", path);
 
-                return fileName;
+                return path;
+            }
+        }
+
+        public void Read(string file)
+        {
+            using (var log = _logService.GetLogger())
+            {
+                var data = System.IO.File.ReadAllText(file);
+
+                log.Information("Loaded run file: {file}", file);
+
             }
         }
     }

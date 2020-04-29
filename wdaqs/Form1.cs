@@ -67,5 +67,14 @@ namespace wdaqs
             stop_btn.Enabled = false;
             load_data_btn.Enabled = true;
         }
+
+        private void load_data_btn_Click(object sender, EventArgs e)
+        {
+            var dialog = file_dialog.ShowDialog();
+            if (dialog == DialogResult.OK)
+            {
+                _wdaqService.Load(file_dialog.FileName);
+            }
+        }
     }
 }

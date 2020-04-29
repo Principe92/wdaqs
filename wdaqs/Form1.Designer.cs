@@ -37,6 +37,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.file_dialog = new System.Windows.Forms.OpenFileDialog();
             this.control_box.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -64,6 +65,7 @@
             this.load_data_btn.TabIndex = 4;
             this.load_data_btn.Text = "Cargar Datos Anteriores";
             this.load_data_btn.UseVisualStyleBackColor = true;
+            this.load_data_btn.Click += new System.EventHandler(this.load_data_btn_Click);
             // 
             // stop_btn
             // 
@@ -136,6 +138,12 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Presión Barométrica";
             // 
+            // file_dialog
+            // 
+            this.file_dialog.DefaultExt = "json";
+            this.file_dialog.Filter = "JSON File (*.json)|*.json";
+            this.file_dialog.InitialDirectory = "~\\wdaqs";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -165,6 +173,7 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.OpenFileDialog file_dialog;
     }
 }
 

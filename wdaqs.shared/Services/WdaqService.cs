@@ -8,7 +8,7 @@ namespace wdaqs.shared.Services
     {
         private readonly IWdaqFileService _wdaqFileService;
 
-        private string currentFile;
+        private string _currentFile;
 
         private Thread _thread;
 
@@ -19,7 +19,7 @@ namespace wdaqs.shared.Services
 
         public void Start(WdaqRequest request)
         {
-            currentFile = _wdaqFileService.StartNewRecord(request);
+            _currentFile = _wdaqFileService.StartNewRecord(request);
 
             _thread = new Thread(ReadFromPort);
             _thread.Start();
@@ -28,6 +28,13 @@ namespace wdaqs.shared.Services
         public void Stop()
         {
             _thread.Abort();
+        }
+
+        public void Load(string file)
+        {
+            _currentFile = file;
+
+            _wdaqFileService.Read(file);
         }
 
         private void ReadFromPort()

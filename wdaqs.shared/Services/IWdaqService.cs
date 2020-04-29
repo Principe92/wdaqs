@@ -6,5 +6,6 @@ namespace wdaqs.shared.Services
     {
         void Start(WdaqRequest request);
         void Stop();
+        void Load(string file);
     }
 }
