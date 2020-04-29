@@ -32,5 +32,3 @@ jobs:
       uses: warrenbuckley/SetUp-MSBuild@v1
     - name: Build with MSBuild
       run: msbuild wdaqs.sln -p:Configuration=Release
-    - name: Run Tests
-      run: dotnet test --versbosity normal
