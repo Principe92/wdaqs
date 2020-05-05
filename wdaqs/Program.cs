@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Forms;
+using Serilog.Events;
 using wdaqs.shared.Services.Log;
 
 namespace wdaqs
@@ -15,26 +16,23 @@ namespace wdaqs
         {
             var log = new LogService();
 
-            using (var logger = log.GetLogger())
+            // Add handler to handle the exception raised by main threads
+            Application.ThreadException += Application_ThreadException;
+
+            // Add handler to handle the exception raised by additional threads
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
+            try
             {
-                // Add handler to handle the exception raised by main threads
-                Application.ThreadException += Application_ThreadException;
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new Form1());
 
-                // Add handler to handle the exception raised by additional threads
-                AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-
-                try
-                {
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                    Application.Run(new Form1());
-
-                    logger.Information("Started wdaqs application successfully");
-                }
-                catch (Exception exception)
-                {
-                    logger.Error(exception, "An exception has occurred running the code");
-                }
+                log.Log(LogEventLevel.Information, "Started wdaqs application successfully");
+            }
+            catch (Exception exception)
+            {
+                log.Log(exception, LogEventLevel.Fatal, "An exception has occurred running the code");
             }
         }
 
@@ -42,26 +40,18 @@ namespace wdaqs
         {
             var log = new LogService();
 
-            using (var logger = log.GetLogger())
-            {
-                var exception = e.ExceptionObject as Exception ?? new Exception("An unhandled exception occurred");
+            var exception = e.ExceptionObject as Exception ?? new Exception("An unhandled exception occurred");
 
-                logger.Error(exception, "An exception occurred");
-            }
-
+            log.Log(exception, LogEventLevel.Fatal, "An exception occurred");
         }
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
             var log = new LogService();
 
-            using (var logger = log.GetLogger())
-            {
-                var exception = e.Exception ?? new Exception("An application thread exception occurred");
+            var exception = e.Exception ?? new Exception("An application thread exception occurred");
 
-                logger.Error(exception, "An exception occurred");
-            }
-
+            log.Log(exception, LogEventLevel.Fatal, "An exception occurred");
         }
     }
 }
