@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Serilog.Events;
 using wdaqs.shared.Model;
 using wdaqs.shared.Services.Log;
 
@@ -33,29 +34,22 @@ namespace wdaqs.shared.Services.File
 
         public string StartNewRecord(WdaqRequest request)
         {
-            using (var log = _logService.GetLogger())
-            {
-                var fileName = $"{DateTime.Now:yyyy.MM.dd.HH.mm.ss}.wdaqs.{request.PortNumber}.json";
+            var fileName = $"{DateTime.Now:yyyy.MM.dd.HH.mm.ss}.wdaqs.{request.PortNumber}.json";
 
-                var path = $"{_fullFolder}\\{fileName}";
+            var path = $"{_fullFolder}\\{fileName}";
 
-                System.IO.File.WriteAllText(path, string.Empty);
+            System.IO.File.WriteAllText(path, string.Empty);
 
-                log.Information("started a new run file: {file}", path);
+            _logService.Log(LogEventLevel.Information, "started a new run file: {file}", path);
 
-                return path;
-            }
+            return path;
         }
 
         public void Read(string file)
         {
-            using (var log = _logService.GetLogger())
-            {
-                var data = System.IO.File.ReadAllText(file);
+            var data = System.IO.File.ReadAllText(file);
 
-                log.Information("Loaded run file: {file}", file);
-
-            }
+            _logService.Log(LogEventLevel.Information, "Loaded run file: {file}", file);
         }
     }
 }

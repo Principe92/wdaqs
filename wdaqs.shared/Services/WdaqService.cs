@@ -1,6 +1,10 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
+using RJCP.IO.Ports;
+using Serilog.Events;
 using wdaqs.shared.Model;
 using wdaqs.shared.Services.File;
+using wdaqs.shared.Services.Log;
 
 namespace wdaqs.shared.Services
 {
@@ -12,13 +16,21 @@ namespace wdaqs.shared.Services
 
         private Thread _thread;
 
-        public WdaqService(IWdaqFileService wdaqFileService)
+        private SerialPortStream _stream;
+
+        private WdaqRequest _request;
+
+        private ILogService _logService;
+
+        public WdaqService(IWdaqFileService wdaqFileService, ILogService logService)
         {
             _wdaqFileService = wdaqFileService;
+            _logService = logService;
         }
 
         public void Start(WdaqRequest request)
         {
+            _request = request;
             _currentFile = _wdaqFileService.StartNewRecord(request);
 
             _thread = new Thread(ReadFromPort);
@@ -27,6 +39,7 @@ namespace wdaqs.shared.Services
 
         public void Stop()
         {
+            _stream.Dispose();
             _thread.Abort();
         }
 
@@ -39,10 +52,27 @@ namespace wdaqs.shared.Services
 
         private void ReadFromPort()
         {
-
-            while (true)
+            try
             {
-                // Do stuff here
+                _stream = new SerialPortStream(_request.PortNumber, 9600, 8, Parity.None, StopBits.One);
+
+                while (true)
+                {
+                    // Do stuff here
+
+                    var data = _stream.ReadLine();
+
+                    _logService.Log(LogEventLevel.Information, "data: {data}", data);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                _stream.Dispose();
             }
         }
     }
