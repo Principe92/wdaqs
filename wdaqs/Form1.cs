@@ -63,6 +63,11 @@ namespace wdaqs
             pressure_chart.Series.First().Values.Add(reading.Pressure.Pressure);
             // pressure_chart.AxisX.First().Labels.Add(time.ToString());
 
+            control_box.Invoke((MethodInvoker) (() =>
+            {
+                altitude_txt.Text = $"Altitud: {reading.Pressure.Altitude}";
+
+            }));
         }
 
         private void LoadSerialPorts()
@@ -96,6 +101,15 @@ namespace wdaqs
             chart.DataClick += CartesianChart1OnDataClick;
         }
 
+        private void ClearChart()
+        {
+            temp_chart.Series.First().Values = new ChartValues<decimal>();
+            pressure_chart.Series.First().Values = new ChartValues<decimal>();
+            humidity_chart.Series.First().Values = new ChartValues<decimal>();
+
+            altitude_txt.Text = "Altitud: 0";
+        }
+
         private void CartesianChart1OnDataClick(object sender, ChartPoint chartPoint)
         {
             ShowMessage("(" + chartPoint.X + ", " + chartPoint.Y + ")");
@@ -111,9 +125,7 @@ namespace wdaqs
                 return;
             }
 
-            temp_chart.Series.First().Values = new ChartValues<decimal>();
-            pressure_chart.Series.First().Values = new ChartValues<decimal>();
-            humidity_chart.Series.First().Values = new ChartValues<decimal>();
+            ClearChart();
 
             _wdaqService.Start(new WdaqRequest
             {
@@ -144,6 +156,8 @@ namespace wdaqs
             var dialog = file_dialog.ShowDialog();
             if (dialog == DialogResult.OK)
             {
+                ClearChart();
+
                 _wdaqService.Load(file_dialog.FileName);
             }
         }

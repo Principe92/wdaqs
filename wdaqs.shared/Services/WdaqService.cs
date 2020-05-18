@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using RJCP.IO.Ports;
 using Serilog.Events;
@@ -58,7 +59,21 @@ namespace wdaqs.shared.Services
         {
             _currentFile = file;
 
-            _wdaqFileService.Read(file);
+            var tr = new Thread(LoadFile);
+            tr.Start();
+        }
+
+        private void LoadFile()
+        {
+            var run = _wdaqFileService.Read(_currentFile);
+
+            if (run?.Readings != null)
+            {
+                foreach (var reading in run.Readings.OrderBy(x => x.Timestamp))
+                {
+                    DataReceived?.Invoke(this, reading);
+                }
+            }
         }
 
         public event EventHandler<WdaqReading> DataReceived;
