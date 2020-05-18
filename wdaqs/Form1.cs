@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Globalization;
+using System.Linq;
 using System.Windows.Forms;
-using System.Windows.Media;
 using LiveCharts;
 using LiveCharts.Wpf;
 using Ninject;
 using RJCP.IO.Ports;
+using Serilog.Events;
 using wdaqs.shared;
 using wdaqs.shared.Model;
 using wdaqs.shared.Services;
@@ -18,6 +20,7 @@ namespace wdaqs
         private IKernel _kernel;
 
         private ILogService _logService;
+
         private IWdaqService _wdaqService;
 
         public Form1()
@@ -38,11 +41,28 @@ namespace wdaqs
             _logService = _kernel.Get<ILogService>();
             _wdaqService = _kernel.Get<IWdaqService>();
 
+            _wdaqService.DataReceived += WdaqReadingReceived;
+
             LoadSerialPorts();
 
-            LineChart(temp_chart);
-            LineChart(humidity_chart);
-            LineChart(pressure_chart);
+            LineChart(temp_chart, "Temperatura");
+            LineChart(humidity_chart, "Humedad");
+            LineChart(pressure_chart, "Presión");
+        }
+
+        private void WdaqReadingReceived(object sender, WdaqReading reading)
+        {
+            var time = reading.Timestamp.Minute;
+
+            temp_chart.Series.First().Values.Add(reading.Temperature);
+            // temp_chart.AxisX.First().Labels.Add(time.ToString());
+
+            humidity_chart.Series.First().Values.Add(reading.Humidity);
+            // humidity_chart.AxisX.First().Labels.Add(time.ToString());
+
+            pressure_chart.Series.First().Values.Add(reading.Pressure.Pressure);
+            // pressure_chart.AxisX.First().Labels.Add(time.ToString());
+
         }
 
         private void LoadSerialPorts()
@@ -54,27 +74,21 @@ namespace wdaqs
         }
 
 
-        private void LineChart(CartesianChart chart)
+        private void LineChart(CartesianChart chart, string title)
         {
             chart.Series = new SeriesCollection
             {
                 new LineSeries
                 {
-                    Title = "Temperatura",
-                    Values = new ChartValues<double> {4, 6, 5, 2, 7}
+                    Title = title,
+                    Values = new ChartValues<decimal> ()
                 }
             };
 
-            chart.AxisX.Add(new Axis
-            {
-                Title = "Month",
-                Labels = new[] {"Jan", "Feb", "Mar", "Apr", "May"}
-            });
-
             chart.AxisY.Add(new Axis
             {
-                Title = "Temperatura",
-                LabelFormatter = value => value.ToString("C")
+                Title = title,
+                LabelFormatter = value => value.ToString(CultureInfo.CurrentCulture)
             });
 
             chart.LegendLocation = LegendLocation.Top;
@@ -84,17 +98,22 @@ namespace wdaqs
 
         private void CartesianChart1OnDataClick(object sender, ChartPoint chartPoint)
         {
-            ShowMessage("You clicked (" + chartPoint.X + "," + chartPoint.Y + ")");
+            ShowMessage("(" + chartPoint.X + ", " + chartPoint.Y + ")");
+
         }
 
         private void start_btn_Click(object sender, EventArgs e)
         {
-            var portNumber = serial_ports.SelectedText;
+            var portNumber = "1234"; // serial_ports.SelectedText;
             if (string.IsNullOrWhiteSpace(portNumber))
             {
                 ShowMessage("Por favor, selecciona una puerta serial");
                 return;
             }
+
+            temp_chart.Series.First().Values = new ChartValues<decimal>();
+            pressure_chart.Series.First().Values = new ChartValues<decimal>();
+            humidity_chart.Series.First().Values = new ChartValues<decimal>();
 
             _wdaqService.Start(new WdaqRequest
             {

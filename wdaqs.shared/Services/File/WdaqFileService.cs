@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using Newtonsoft.Json;
 using Serilog.Events;
 using wdaqs.shared.Model;
 using wdaqs.shared.Services.Log;
@@ -9,12 +14,16 @@ namespace wdaqs.shared.Services.File
     class WdaqFileService : IWdaqFileService
     {
         private const string FOLDER = "wdaqs";
-        private const string TEMPFOLDER = "wdaqs";
 
         private readonly string _fullFolder;
-        private readonly string _fullTempFolder;
 
         private readonly ILogService _logService;
+
+        private ConcurrentBag<WdaqReading> _cache;
+
+        private const int MAX_SIZE = 5; //1000;
+
+        private SemaphoreSlim _lock;
 
         public WdaqFileService(ILogService logService)
         {
@@ -25,11 +34,7 @@ namespace wdaqs.shared.Services.File
                 Directory.CreateDirectory(_fullFolder);
             }
 
-            _fullTempFolder = Path.Combine(Path.GetTempPath(), TEMPFOLDER);
-            if (!Directory.Exists(_fullTempFolder))
-            {
-                Directory.CreateDirectory(_fullTempFolder);
-            }
+            _lock = new SemaphoreSlim(1);
         }
 
         public string StartNewRecord(WdaqRequest request)
@@ -45,11 +50,65 @@ namespace wdaqs.shared.Services.File
             return path;
         }
 
-        public void Read(string file)
+        public WdaqRun Read(string file)
         {
             var data = System.IO.File.ReadAllText(file);
 
             _logService.Log(LogEventLevel.Information, "Loaded run file: {file}", file);
+
+            return JsonConvert.DeserializeObject<WdaqRun>(data);
+        }
+
+        public void WriteToFile(WdaqReading reading, string currentFile)
+        {
+            _lock.Wait();
+            
+            if (_cache == null)
+            {
+                _cache = new ConcurrentBag<WdaqReading>();
+            }
+
+            if (_cache.Count == MAX_SIZE)
+            {
+                var data = _cache.ToList();
+                var tr = new Thread(() => StoreFile(data, currentFile));
+                tr.Start();
+
+                _cache = null;
+            }
+            else
+            {
+                _cache.Add(reading);
+            }
+
+            _lock.Release();
+        }
+
+        public void CleanUp(string currentFile)
+        {
+            if (_cache != null)
+            {
+                StoreFile(_cache.ToList(), currentFile);
+            }
+
+            _cache = null;
+        }
+
+        private void StoreFile(List<WdaqReading> wdaqReadings, string currentFile)
+        {
+            var run = Read(currentFile) ?? new WdaqRun();
+
+            if (run.Readings == null)
+            {
+                run.Readings = new List<WdaqReading>();
+            }
+
+            run.Readings.AddRange(wdaqReadings);
+
+            System.IO.File.WriteAllText(currentFile, JsonConvert.SerializeObject(run));
+
+            _logService.Log(LogEventLevel.Information, "Saved data for run file: {file}", currentFile);
+
         }
     }
 }

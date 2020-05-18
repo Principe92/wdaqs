@@ -12,6 +12,8 @@ namespace wdaqs.shared.Services
     {
         private readonly IWdaqFileService _wdaqFileService;
 
+        private readonly IWdaqDataParser _dataParser;
+
         private string _currentFile;
 
         private Thread _thread;
@@ -20,12 +22,13 @@ namespace wdaqs.shared.Services
 
         private WdaqRequest _request;
 
-        private ILogService _logService;
+        private readonly ILogService _logService;
 
-        public WdaqService(IWdaqFileService wdaqFileService, ILogService logService)
+        public WdaqService(IWdaqFileService wdaqFileService, ILogService logService, IWdaqDataParser dataParser)
         {
             _wdaqFileService = wdaqFileService;
             _logService = logService;
+            _dataParser = dataParser;
         }
 
         public void Start(WdaqRequest request)
@@ -39,8 +42,16 @@ namespace wdaqs.shared.Services
 
         public void Stop()
         {
-            _stream.Dispose();
-            _thread.Abort();
+            try
+            {
+                _stream?.Dispose();
+                _thread?.Abort();
+                _wdaqFileService.CleanUp(_currentFile);
+            }
+            catch (Exception exception)
+            {
+                _logService.Log(exception, LogEventLevel.Fatal, "An exception has occurred aborting thread");
+            }
         }
 
         public void Load(string file)
@@ -50,30 +61,53 @@ namespace wdaqs.shared.Services
             _wdaqFileService.Read(file);
         }
 
+        public event EventHandler<WdaqReading> DataReceived;
+
         private void ReadFromPort()
         {
             try
             {
-                _stream = new SerialPortStream(_request.PortNumber, 9600, 8, Parity.None, StopBits.One);
+                // _stream = new SerialPortStream(_request.PortNumber, 115200, 8, Parity.None, StopBits.One);
+
+                var index = 0;
 
                 while (true)
                 {
-                    // Do stuff here
+                    // var data = _stream.ReadLine();
 
-                    var data = _stream.ReadLine();
+                    Thread.Sleep(TimeSpan.FromSeconds(5));
+
+                    index += 10;
+
+                    var now = DateTime.UtcNow;
+
+                    var data = $"  2211407185 {now.Year}/{now.Month}/{now.Day} {now.Hour}:{now.Minute}:{now.Second} {index} {index} 7784 -507 976 1280 232 0 9999 9999 9999 0 {index} 30366 1180 6812 7040 354";
+
+                    if (string.IsNullOrWhiteSpace(data))
+                    {
+                        _logService.Log(LogEventLevel.Information, "Line read is null");
+                        continue;
+                    }
 
                     _logService.Log(LogEventLevel.Information, "data: {data}", data);
+
+                    var reading = _dataParser.GetReading(data);
+
+                    DataReceived?.Invoke(this, reading);
+
+                    _wdaqFileService.WriteToFile(reading, _currentFile);
                 }
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                throw;
+                _logService.Log(e, LogEventLevel.Fatal, "An exception has occurred reading data from stream");
             }
             finally
             {
-                _stream.Dispose();
+                _stream?.Dispose();
             }
         }
+
+       
     }
 }

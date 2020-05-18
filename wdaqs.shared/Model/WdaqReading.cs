@@ -1,17 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace wdaqs.shared.Model
 {
-    public class WdaqReading
+    public class WdaqReading : EventArgs
     {
-        public Temperature Temperature { get; set; }
+        public DateTime RealTimeClock { get; set; }
+
+        public DateTime Timestamp { get; set; }
+
+        public decimal Temperature { get; set; }
+
+        public decimal Humidity { get; set; }
+
+        public Accelerometer Accelerometer { get; set; }
+
+        public Compass Compass { get; set; }
+
+        public Gyroscope Gyroscope { get; set; }
 
         public BarometricPressure Pressure { get; set; }
 
-        public Humidity Humidity { get; set; }
-
-        public DateTime Time { get; set; }
+        public WindSensor WindSensor { get; set; }
     }
 }

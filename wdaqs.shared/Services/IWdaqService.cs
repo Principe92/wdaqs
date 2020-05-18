@@ -1,4 +1,5 @@
-﻿using wdaqs.shared.Model;
+﻿using System;
+using wdaqs.shared.Model;
 
 namespace wdaqs.shared.Services
 {
@@ -7,5 +8,7 @@ namespace wdaqs.shared.Services
         void Start(WdaqRequest request);
         void Stop();
         void Load(string file);
+
+        event EventHandler<WdaqReading> DataReceived;
     }
 }

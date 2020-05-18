@@ -14,6 +14,8 @@ namespace wdaqs.shared
             Bind<IWdaqFileService>().To<WdaqFileService>().InSingletonScope();
 
             Bind<ILogService>().To<LogService>().InSingletonScope();
+
+            Bind<IWdaqDataParser>().To<WdaqDataParser>().InSingletonScope();
         }
     }
 }
