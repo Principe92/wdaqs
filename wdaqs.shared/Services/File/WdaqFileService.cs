@@ -21,7 +21,7 @@ namespace wdaqs.shared.Services.File
 
         private ConcurrentBag<WdaqReading> _cache;
 
-        private const int MAX_SIZE = 5; //1000;
+        private const int MAX_SIZE = 1000;
 
         private SemaphoreSlim _lock;
 

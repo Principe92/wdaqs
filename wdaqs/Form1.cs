@@ -118,7 +118,7 @@ namespace wdaqs
 
         private void start_btn_Click(object sender, EventArgs e)
         {
-            var portNumber = "1234"; // serial_ports.SelectedText;
+            var portNumber = (string) serial_ports.SelectedItem;
             if (string.IsNullOrWhiteSpace(portNumber))
             {
                 ShowMessage("Por favor, selecciona una puerta serial");
