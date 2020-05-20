@@ -83,6 +83,7 @@ namespace wdaqs.shared.Services
             try
             {
                  _stream = new SerialPortStream(_request.PortNumber, 115200, 8, Parity.None, StopBits.One);
+                 _stream.Open();
 
                 var index = 0;
 
