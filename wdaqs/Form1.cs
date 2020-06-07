@@ -52,7 +52,6 @@ namespace wdaqs
             LineChart(temp_chart, "Temperatura", "Temperatura");
             LineChart(humidity_chart, "Humedad", "Humedad");
             LineChart(pressure_chart, "Presión Barométrica", "Temperatura", "Presión", "Altitud");
-            LineChart(air_pressure, "Presión de Viento", "Presión de Viento");
             LineChart(accelerometer, "Acelerómetro", "X", "Y", "Z");
             LineChart(gyroscope, "Giroscopio", "X", "Y", "Z");
         }
@@ -62,8 +61,6 @@ namespace wdaqs
             temp_chart.Series.First().Values.Add(reading.Temperature);
 
             humidity_chart.Series.First().Values.Add(reading.Humidity);
-
-            air_pressure.Series.First().Values.Add(reading.WindSensor.WindMph);
 
             pressure_chart.Series[0].Values.Add(reading.Pressure.Temperature);
             pressure_chart.Series[1].Values.Add(reading.Pressure.Pressure);
@@ -80,7 +77,7 @@ namespace wdaqs
             control_box.Invoke((MethodInvoker) (() =>
             {
                 altitude_txt.Text = $"Altitud: {reading.Pressure.Altitude}";
-                wind_speed_label.Text = $"Velocidad de viento: {reading.WindSensor.WindAdUnit}";
+                wind_speed_label.Text = $"Velocidad de viento: {reading.WindSensor.WindMph}";
 
             }));
         }
@@ -138,6 +135,7 @@ namespace wdaqs
             humidity_chart.Series.First().Values = new ChartValues<decimal>();
 
             altitude_txt.Text = @"Altitud: 0";
+
             wind_speed_label.Text = @"Velocided de Viento: 0";
         }
 

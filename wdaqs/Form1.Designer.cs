@@ -29,22 +29,21 @@
         private void InitializeComponent()
         {
             this.control_box = new System.Windows.Forms.GroupBox();
-            this.altitude_txt = new System.Windows.Forms.Label();
+            this.baud_txt = new System.Windows.Forms.TextBox();
             this.serial_ports = new System.Windows.Forms.ComboBox();
             this.load_data_btn = new System.Windows.Forms.Button();
             this.stop_btn = new System.Windows.Forms.Button();
             this.start_btn = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.altitude_txt = new System.Windows.Forms.Label();
             this.temp_chart = new LiveCharts.WinForms.CartesianChart();
             this.humidity_chart = new LiveCharts.WinForms.CartesianChart();
             this.pressure_chart = new LiveCharts.WinForms.CartesianChart();
             this.file_dialog = new System.Windows.Forms.OpenFileDialog();
-            this.baud_txt = new System.Windows.Forms.TextBox();
             this.wind_speed_label = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.air_pressure = new LiveCharts.WinForms.CartesianChart();
             this.gyroscope = new LiveCharts.WinForms.CartesianChart();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.accelerometer = new LiveCharts.WinForms.CartesianChart();
             this.control_box.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -68,15 +67,13 @@
             this.control_box.TabStop = false;
             this.control_box.Text = "Controles";
             // 
-            // altitude_txt
+            // baud_txt
             // 
-            this.altitude_txt.AutoSize = true;
-            this.altitude_txt.Location = new System.Drawing.Point(5, 29);
-            this.altitude_txt.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.altitude_txt.Name = "altitude_txt";
-            this.altitude_txt.Size = new System.Drawing.Size(48, 13);
-            this.altitude_txt.TabIndex = 6;
-            this.altitude_txt.Text = "Altitud: 0";
+            this.baud_txt.Location = new System.Drawing.Point(350, 29);
+            this.baud_txt.Name = "baud_txt";
+            this.baud_txt.Size = new System.Drawing.Size(174, 20);
+            this.baud_txt.TabIndex = 7;
+            this.baud_txt.Text = "Velocidad de transmisión";
             // 
             // serial_ports
             // 
@@ -125,6 +122,16 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Puerta Seriales";
             // 
+            // altitude_txt
+            // 
+            this.altitude_txt.AutoSize = true;
+            this.altitude_txt.Location = new System.Drawing.Point(5, 29);
+            this.altitude_txt.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.altitude_txt.Name = "altitude_txt";
+            this.altitude_txt.Size = new System.Drawing.Size(48, 13);
+            this.altitude_txt.TabIndex = 6;
+            this.altitude_txt.Text = "Altitud: 0";
+            // 
             // temp_chart
             // 
             this.temp_chart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -161,14 +168,6 @@
             this.file_dialog.Filter = "JSON File (*.json)|*.json";
             this.file_dialog.InitialDirectory = "~\\wdaqs";
             // 
-            // baud_txt
-            // 
-            this.baud_txt.Location = new System.Drawing.Point(350, 29);
-            this.baud_txt.Name = "baud_txt";
-            this.baud_txt.Size = new System.Drawing.Size(174, 20);
-            this.baud_txt.TabIndex = 7;
-            this.baud_txt.Text = "Velocidad de transmisión";
-            // 
             // wind_speed_label
             // 
             this.wind_speed_label.AutoSize = true;
@@ -188,9 +187,8 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel1.Controls.Add(this.accelerometer, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.accelerometer, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.gyroscope, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.air_pressure, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.pressure_chart, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.humidity_chart, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.temp_chart, 0, 0);
@@ -202,6 +200,16 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 273F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1119, 818);
             this.tableLayoutPanel1.TabIndex = 3;
+            // 
+            // gyroscope
+            // 
+            this.gyroscope.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gyroscope.Location = new System.Drawing.Point(3, 547);
+            this.gyroscope.Name = "gyroscope";
+            this.gyroscope.Size = new System.Drawing.Size(553, 250);
+            this.gyroscope.TabIndex = 4;
+            this.gyroscope.Text = "cartesianChart1";
             // 
             // groupBox1
             // 
@@ -216,35 +224,15 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Otras informaciónes";
             // 
-            // air_pressure
-            // 
-            this.air_pressure.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.air_pressure.Location = new System.Drawing.Point(562, 261);
-            this.air_pressure.Name = "air_pressure";
-            this.air_pressure.Size = new System.Drawing.Size(554, 250);
-            this.air_pressure.TabIndex = 3;
-            this.air_pressure.Text = "cartesianChart1";
-            // 
-            // gyroscope
-            // 
-            this.gyroscope.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gyroscope.Location = new System.Drawing.Point(562, 547);
-            this.gyroscope.Name = "gyroscope";
-            this.gyroscope.Size = new System.Drawing.Size(554, 250);
-            this.gyroscope.TabIndex = 4;
-            this.gyroscope.Text = "cartesianChart1";
-            // 
             // accelerometer
             // 
             this.accelerometer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.accelerometer.Location = new System.Drawing.Point(3, 547);
+            this.accelerometer.Location = new System.Drawing.Point(562, 261);
             this.accelerometer.Name = "accelerometer";
-            this.accelerometer.Size = new System.Drawing.Size(553, 250);
-            this.accelerometer.TabIndex = 5;
-            this.accelerometer.Text = "cartesianChart2";
+            this.accelerometer.Size = new System.Drawing.Size(554, 250);
+            this.accelerometer.TabIndex = 6;
+            this.accelerometer.Text = "cartesianChart1";
             // 
             // Form1
             // 
@@ -283,7 +271,6 @@
         private System.Windows.Forms.TextBox baud_txt;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private LiveCharts.WinForms.CartesianChart gyroscope;
-        private LiveCharts.WinForms.CartesianChart air_pressure;
         private System.Windows.Forms.GroupBox groupBox1;
         private LiveCharts.WinForms.CartesianChart accelerometer;
     }
