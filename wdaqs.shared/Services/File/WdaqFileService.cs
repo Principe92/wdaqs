@@ -23,7 +23,7 @@ namespace wdaqs.shared.Services.File
 
         private const int MAX_SIZE = 1000;
 
-        private SemaphoreSlim _lock;
+        private readonly SemaphoreSlim _lock;
 
         public WdaqFileService(ILogService logService)
         {

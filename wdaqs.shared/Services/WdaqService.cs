@@ -82,37 +82,34 @@ namespace wdaqs.shared.Services
         {
             try
             {
-                _stream = new SerialPortStream(_request.PortNumber, 115200, 8, Parity.None, StopBits.One);
+                _stream = new SerialPortStream(_request.PortNumber, _request.BaudRate, 8, Parity.None, StopBits.One);
                 _stream.Open();
 
-                var index = 0;
-
-                while (true)
+                try
                 {
-                    var data = _stream.ReadLine();
-
-                    //Thread.Sleep(TimeSpan.FromSeconds(5));
-
-                    index += 10;
-
-                    var now = DateTime.UtcNow;
-
-                    //var data = $"  2211407185 {now.Year}/{now.Month}/{now.Day} {now.Hour}:{now.Minute}:{now.Second} {index} {index} 7784 -507 976 1280 232 0 9999 9999 9999 0 {index} 30366 1180 6812 7040 354";
-
-                    if (!IsValid(data))
+                    while (true)
                     {
-                        _logService.Log(LogEventLevel.Information, "Line read is null or invalid");
-                        continue;
+                        var data = _stream.ReadLine();
+
+                        if (!IsValid(data))
+                        {
+                            _logService.Log(LogEventLevel.Information, "Line read is null or invalid");
+                            continue;
+                        }
+
+
+                        _logService.Log(LogEventLevel.Information, "data: {data}", data);
+
+                        var reading = _dataParser.GetReading(data);
+
+                        DataReceived?.Invoke(this, reading);
+
+                        _wdaqFileService.WriteToFile(reading, _currentFile);
                     }
-
-
-                    _logService.Log(LogEventLevel.Information, "data: {data}", data);
-
-                    var reading = _dataParser.GetReading(data);
-
-                    DataReceived?.Invoke(this, reading);
-
-                    _wdaqFileService.WriteToFile(reading, _currentFile);
+                }
+                catch (Exception exception)
+                {
+                    _logService.Log(exception, LogEventLevel.Fatal, "An exception has occurred processing data from stream");
                 }
             }
             catch (Exception e)

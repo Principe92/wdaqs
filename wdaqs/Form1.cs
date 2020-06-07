@@ -29,7 +29,11 @@ namespace wdaqs
 
             stop_btn.Enabled = false;
 
+            baud_txt.Text = @"115200";
+
             InitServices();
+
+            _logService.Log(LogEventLevel.Information, "Started wdaq program");
         }
 
         private void InitServices()
@@ -45,27 +49,38 @@ namespace wdaqs
 
             LoadSerialPorts();
 
-            LineChart(temp_chart, "Temperatura");
-            LineChart(humidity_chart, "Humedad");
-            LineChart(pressure_chart, "Presión");
+            LineChart(temp_chart, "Temperatura", "Temperatura");
+            LineChart(humidity_chart, "Humedad", "Humedad");
+            LineChart(pressure_chart, "Presión Barométrica", "Temperatura", "Presión", "Altitud");
+            LineChart(air_pressure, "Presión de Viento", "Presión de Viento");
+            LineChart(accelerometer, "Acelerómetro", "X", "Y", "Z");
+            LineChart(gyroscope, "Giroscopio", "X", "Y", "Z");
         }
 
         private void WdaqReadingReceived(object sender, WdaqReading reading)
         {
-            var time = reading.Timestamp.Minute;
-
             temp_chart.Series.First().Values.Add(reading.Temperature);
-            // temp_chart.AxisX.First().Labels.Add(time.ToString());
 
             humidity_chart.Series.First().Values.Add(reading.Humidity);
-            // humidity_chart.AxisX.First().Labels.Add(time.ToString());
 
-            pressure_chart.Series.First().Values.Add(reading.Pressure.Pressure);
-            // pressure_chart.AxisX.First().Labels.Add(time.ToString());
+            air_pressure.Series.First().Values.Add(reading.WindSensor.WindMph);
+
+            pressure_chart.Series[0].Values.Add(reading.Pressure.Temperature);
+            pressure_chart.Series[1].Values.Add(reading.Pressure.Pressure);
+            pressure_chart.Series[2].Values.Add(reading.Pressure.Altitude);
+
+            accelerometer.Series[0].Values.Add(reading.Accelerometer.XValue);
+            accelerometer.Series[1].Values.Add(reading.Accelerometer.YValue);
+            accelerometer.Series[2].Values.Add(reading.Accelerometer.ZValue);
+
+            gyroscope.Series[0].Values.Add(reading.Gyroscope.XValue);
+            gyroscope.Series[1].Values.Add(reading.Gyroscope.YValue);
+            gyroscope.Series[2].Values.Add(reading.Gyroscope.ZValue);
 
             control_box.Invoke((MethodInvoker) (() =>
             {
                 altitude_txt.Text = $"Altitud: {reading.Pressure.Altitude}";
+                wind_speed_label.Text = $"Velocidad de viento: {reading.WindSensor.WindAdUnit}";
 
             }));
         }
@@ -79,16 +94,16 @@ namespace wdaqs
         }
 
 
-        private void LineChart(CartesianChart chart, string title)
+        private void LineChart(CartesianChart chart, string title, params string[] titles)
         {
-            chart.Series = new SeriesCollection
+            var series = titles.Select(x => new LineSeries
             {
-                new LineSeries
-                {
-                    Title = title,
-                    Values = new ChartValues<decimal> ()
-                }
-            };
+                Title = x,
+                Values = new ChartValues<decimal>()
+            });
+
+            chart.Series = new SeriesCollection();
+            chart.Series.AddRange(series);
 
             chart.AxisY.Add(new Axis
             {
@@ -104,10 +119,26 @@ namespace wdaqs
         private void ClearChart()
         {
             temp_chart.Series.First().Values = new ChartValues<decimal>();
-            pressure_chart.Series.First().Values = new ChartValues<decimal>();
+
+            foreach (var series in pressure_chart.Series)
+            {
+                series.Values = new ChartValues<decimal>();
+            }
+
+            foreach (var series in gyroscope.Series)
+            {
+                series.Values = new ChartValues<decimal>();
+            }
+
+            foreach (var series in accelerometer.Series)
+            {
+                series.Values = new ChartValues<decimal>();
+            }
+
             humidity_chart.Series.First().Values = new ChartValues<decimal>();
 
-            altitude_txt.Text = "Altitud: 0";
+            altitude_txt.Text = @"Altitud: 0";
+            wind_speed_label.Text = @"Velocided de Viento: 0";
         }
 
         private void CartesianChart1OnDataClick(object sender, ChartPoint chartPoint)
@@ -125,11 +156,18 @@ namespace wdaqs
                 return;
             }
 
+            if (!int.TryParse(baud_txt.Text, out var baudRate))
+            {
+                ShowMessage("Por favor, se necesita una velocidad de transmisión");
+                return;
+            }
+
             ClearChart();
 
             _wdaqService.Start(new WdaqRequest
             {
-                PortNumber = portNumber
+                PortNumber = portNumber,
+                BaudRate = baudRate
             });
 
             start_btn.Enabled = false;
