@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -23,18 +24,24 @@ namespace wdaqs.shared.Services.Log
 
         public void Log(LogEventLevel level, string message, params object[] param)
         {
-            using (var log = GetLogger())
+            Task.Factory.StartNew(() =>
             {
-                log.ForContext<WdaqService>().Write(level, message, param);
-            }
+                using (var log = GetLogger())
+                {
+                    log.ForContext<WdaqService>().Write(level, message, param);
+                }
+            });
         }
 
         public void Log(Exception ex, LogEventLevel level, string message, params object[] param)
         {
-            using (var log = GetLogger())
+            Task.Factory.StartNew(() =>
             {
-                log.ForContext<WdaqService>().Write(level, ex, message, param);
-            }
+                using (var log = GetLogger())
+                {
+                    log.ForContext<WdaqService>().Write(level, ex, message, param);
+                }
+            });
         }
     }
 }

@@ -5,6 +5,8 @@ namespace wdaqs.shared.Services.File
     public interface IWdaqFileService
     {
         string StartNewRecord(WdaqRequest request);
-        void Read(string file);
+        WdaqRun Read(string file);
+        void WriteToFile(WdaqReading reading, string currentFile);
+        void CleanUp(string currentFile);
     }
 }
