@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 using Serilog.Events;
 using wdaqs.shared.Model;
 using wdaqs.shared.Services.Log;
+using wdaqs.shared.Services.Settings;
 
 namespace wdaqs.shared.Services.File
 {
     class WdaqFileService : IWdaqFileService
     {
-        private const string FOLDER = "wdaqs";
-
-        private readonly string _fullFolder;
-
         private readonly ILogService _logService;
+
+        private readonly IWdaqSettingService _settingService;
 
         private ConcurrentBag<WdaqReading> _cache;
 
@@ -25,14 +23,10 @@ namespace wdaqs.shared.Services.File
 
         private readonly SemaphoreSlim _lock;
 
-        public WdaqFileService(ILogService logService)
+        public WdaqFileService(ILogService logService, IWdaqSettingService settingService)
         {
             _logService = logService;
-            _fullFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), FOLDER);
-            if (!Directory.Exists(_fullFolder))
-            {
-                Directory.CreateDirectory(_fullFolder);
-            }
+            _settingService = settingService;
 
             _lock = new SemaphoreSlim(1);
         }
@@ -41,7 +35,9 @@ namespace wdaqs.shared.Services.File
         {
             var fileName = $"{DateTime.Now:yyyy.MM.dd.HH.mm.ss}.wdaqs.{request.PortNumber}.json";
 
-            var path = $"{_fullFolder}\\{fileName}";
+            var setting = _settingService.LoadSetting();
+
+            var path = $"{setting.RunFolder}\\{fileName}";
 
             System.IO.File.WriteAllText(path, string.Empty);
 
@@ -58,6 +54,7 @@ namespace wdaqs.shared.Services.File
 
             return JsonConvert.DeserializeObject<WdaqRun>(data);
         }
+
 
         public void WriteToFile(WdaqReading reading, string currentFile)
         {
@@ -105,7 +102,10 @@ namespace wdaqs.shared.Services.File
 
             run.Readings.AddRange(wdaqReadings);
 
-            System.IO.File.WriteAllText(currentFile, JsonConvert.SerializeObject(run));
+            var data = JsonConvert.SerializeObject(run);
+            data = data.Replace(",", $",{Environment.NewLine}");
+
+            System.IO.File.WriteAllText(currentFile, data);
 
             _logService.Log(LogEventLevel.Information, "Saved data for run file: {file}", currentFile);
 

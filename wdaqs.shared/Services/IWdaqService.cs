@@ -10,5 +10,11 @@ namespace wdaqs.shared.Services
         void Load(string file);
 
         event EventHandler<WdaqReading> DataReceived;
+
+        event EventHandler<string> CsvExported;
+
+        void ExportToCsv();
+        void UpdateRunFolder(string path);
+        event EventHandler<string> FilePath;
     }
 }
