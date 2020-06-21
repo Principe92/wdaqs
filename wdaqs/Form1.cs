@@ -11,6 +11,7 @@ using wdaqs.shared;
 using wdaqs.shared.Model;
 using wdaqs.shared.Services;
 using wdaqs.shared.Services.Log;
+using wdaqs.shared.Services.Settings;
 using CartesianChart = LiveCharts.WinForms.CartesianChart;
 
 namespace wdaqs
@@ -22,12 +23,14 @@ namespace wdaqs
         private ILogService _logService;
 
         private IWdaqService _wdaqService;
+        private IWdaqSettingService _settingSvc;
 
         public Form1()
         {
             InitializeComponent();
 
             stop_btn.Enabled = false;
+            csv_export_btn.Enabled = false;
 
             baud_txt.Text = @"115200";
 
@@ -43,18 +46,30 @@ namespace wdaqs
             _kernel.Load(new WdaqModule());
 
             _logService = _kernel.Get<ILogService>();
+
             _wdaqService = _kernel.Get<IWdaqService>();
 
             _wdaqService.DataReceived += WdaqReadingReceived;
+
+            _wdaqService.CsvExported += CsvFileExported;
 
             LoadSerialPorts();
 
             LineChart(temp_chart, "Temperatura", "Temperatura");
             LineChart(humidity_chart, "Humedad", "Humedad");
             LineChart(pressure_chart, "Presión Barométrica", "Temperatura", "Presión", "Altitud");
-            LineChart(air_pressure, "Presión de Viento", "Presión de Viento");
             LineChart(accelerometer, "Acelerómetro", "X", "Y", "Z");
             LineChart(gyroscope, "Giroscopio", "X", "Y", "Z");
+
+            _settingSvc = _kernel.Get<IWdaqSettingService>();
+            var setting = _settingSvc.LoadSetting();
+
+            path_txt.Text = setting.RunFolder;
+        }
+
+        private void CsvFileExported(object sender, string e)
+        {
+            ShowMessage($"El fichero ha sido exportado al: {e}");
         }
 
         private void WdaqReadingReceived(object sender, WdaqReading reading)
@@ -62,8 +77,6 @@ namespace wdaqs
             temp_chart.Series.First().Values.Add(reading.Temperature);
 
             humidity_chart.Series.First().Values.Add(reading.Humidity);
-
-            air_pressure.Series.First().Values.Add(reading.WindSensor.WindMph);
 
             pressure_chart.Series[0].Values.Add(reading.Pressure.Temperature);
             pressure_chart.Series[1].Values.Add(reading.Pressure.Pressure);
@@ -80,7 +93,7 @@ namespace wdaqs
             control_box.Invoke((MethodInvoker) (() =>
             {
                 altitude_txt.Text = $"Altitud: {reading.Pressure.Altitude}";
-                wind_speed_label.Text = $"Velocidad de viento: {reading.WindSensor.WindAdUnit}";
+                wind_speed_label.Text = $"Velocidad de viento: {reading.WindSensor.WindMph}";
 
             }));
         }
@@ -138,6 +151,7 @@ namespace wdaqs
             humidity_chart.Series.First().Values = new ChartValues<decimal>();
 
             altitude_txt.Text = @"Altitud: 0";
+
             wind_speed_label.Text = @"Velocided de Viento: 0";
         }
 
@@ -172,6 +186,7 @@ namespace wdaqs
 
             start_btn.Enabled = false;
             load_data_btn.Enabled = false;
+            csv_export_btn.Enabled = false;
             stop_btn.Enabled = true;
         }
 
@@ -187,6 +202,7 @@ namespace wdaqs
             start_btn.Enabled = true;
             stop_btn.Enabled = false;
             load_data_btn.Enabled = true;
+            csv_export_btn.Enabled = true;
         }
 
         private void load_data_btn_Click(object sender, EventArgs e)
@@ -197,6 +213,34 @@ namespace wdaqs
                 ClearChart();
 
                 _wdaqService.Load(file_dialog.FileName);
+                csv_export_btn.Enabled = true;
+            }
+        }
+
+        private void csv_export_btn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                _wdaqService.ExportToCsv();
+            }
+            catch (Exception exception)
+            {
+                _logService.Log(exception, LogEventLevel.Error, "Ha occurido un error");
+            }
+        }
+
+        private void folder_change_Click(object sender, EventArgs e)
+        {
+            var setting = _settingSvc.LoadSetting();
+
+            path_selector.SelectedPath = setting.RunFolder;
+
+            var dialog = path_selector.ShowDialog();
+            if (dialog == DialogResult.OK)
+            {
+                _wdaqService.UpdateRunFolder(path_selector.SelectedPath);
+
+                path_txt.Text = path_selector.SelectedPath;
             }
         }
     }

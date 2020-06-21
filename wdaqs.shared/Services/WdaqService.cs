@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using RJCP.IO.Ports;
 using Serilog.Events;
 using wdaqs.shared.Model;
+using wdaqs.shared.Model.Exporter;
+using wdaqs.shared.Services.Exporter;
 using wdaqs.shared.Services.File;
 using wdaqs.shared.Services.Log;
+using wdaqs.shared.Services.Settings;
 
 namespace wdaqs.shared.Services
 {
@@ -14,6 +18,8 @@ namespace wdaqs.shared.Services
         private readonly IWdaqFileService _wdaqFileService;
 
         private readonly IWdaqDataParser _dataParser;
+
+        private readonly IWdaqSettingService _settingService;
 
         private string _currentFile;
 
@@ -25,11 +31,20 @@ namespace wdaqs.shared.Services
 
         private readonly ILogService _logService;
 
-        public WdaqService(IWdaqFileService wdaqFileService, ILogService logService, IWdaqDataParser dataParser)
+        private readonly IDataExporter _dataExporter;
+
+        public WdaqService(
+            IWdaqFileService wdaqFileService, 
+            ILogService logService, 
+            IWdaqDataParser dataParser, 
+            IDataExporter dataExporter, 
+            IWdaqSettingService settingService)
         {
             _wdaqFileService = wdaqFileService;
             _logService = logService;
             _dataParser = dataParser;
+            _dataExporter = dataExporter;
+            _settingService = settingService;
         }
 
         public void Start(WdaqRequest request)
@@ -51,16 +66,46 @@ namespace wdaqs.shared.Services
             }
             catch (Exception exception)
             {
-                _logService.Log(exception, LogEventLevel.Fatal, "An exception has occurred aborting thread");
+                _logService.Log(exception, LogEventLevel.Fatal, "Ha occurrido un error");
             }
+        }
+
+        public event EventHandler<WdaqReading> DataReceived;
+
+        public event EventHandler<string> CsvExported;
+
+        public event EventHandler<string> FilePath;
+
+        public void ExportToCsv()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                var res = _dataExporter.Export(new ExportRequest
+                {
+                    File = _currentFile
+                });
+
+                CsvExported?.Invoke(this, res);
+            });
         }
 
         public void Load(string file)
         {
             _currentFile = file;
 
-            var tr = new Thread(LoadFile);
-            tr.Start();
+            new Thread(LoadFile).Start();
+        }
+
+        public void UpdateRunFolder(string path)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                var setting = _settingService.LoadSetting();
+
+                setting.RunFolder = path;
+
+                _settingService.SaveSetting(setting);
+            });
         }
 
         private void LoadFile()
@@ -76,7 +121,6 @@ namespace wdaqs.shared.Services
             }
         }
 
-        public event EventHandler<WdaqReading> DataReceived;
 
         private void ReadFromPort()
         {
@@ -93,7 +137,7 @@ namespace wdaqs.shared.Services
 
                         if (!IsValid(data))
                         {
-                            _logService.Log(LogEventLevel.Information, "Line read is null or invalid");
+                            _logService.Log(LogEventLevel.Information, "Dato invalido");
                             continue;
                         }
 
@@ -109,12 +153,12 @@ namespace wdaqs.shared.Services
                 }
                 catch (Exception exception)
                 {
-                    _logService.Log(exception, LogEventLevel.Fatal, "An exception has occurred processing data from stream");
+                    _logService.Log(exception, LogEventLevel.Fatal, "Ha occurrido un error");
                 }
             }
             catch (Exception e)
             {
-                _logService.Log(e, LogEventLevel.Fatal, "An exception has occurred reading data from stream");
+                _logService.Log(e, LogEventLevel.Fatal, "Ha occurrido un error");
             }
             finally
             {
